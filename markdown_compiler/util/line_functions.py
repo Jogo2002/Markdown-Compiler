@@ -26,7 +26,20 @@ def compile_headers(line):
     >>> compile_headers('      # this is not a header')
     '      # this is not a header'
     '''
+    if line[:2] == '# ':
+        return '<h1>' + line[1:] + '</h1>'
+    elif line[:3] == '## ':
+        return '<h2>' + line[2:] + '</h2>'
+    elif line[:4] == '### ':
+        return '<h3>' + line[3:] + '</h3>'
+    elif line[:5] == '#### ':
+        return '<h4>' + line[4:] + '</h4>'
+    elif line[:6] == '##### ':
+        return '<h5>' + line[5:] + '</h5>'
+    elif line[:7] == '###### ':
+        return '<h6>' + line[6:] + '</h6>'
     return line
+
 
 
 def compile_italic_star(line):
@@ -50,8 +63,24 @@ def compile_italic_star(line):
     >>> compile_italic_star('*')
     '*'
     '''
-    return line
 
+    out = ""
+    i = 0
+
+    while i < len(line):
+        if line[i] == "*":
+            j = line.find("*", i + 1)
+            if j == -1:
+                out += line[i:]
+                break
+
+            out += "<i>" + line[i + 1:j] + "</i>"
+            i = j + 1
+        else:
+            out += line[i]
+            i += 1
+
+    return out
 
 def compile_italic_underscore(line):
     '''
@@ -71,8 +100,23 @@ def compile_italic_underscore(line):
     >>> compile_italic_underscore('_')
     '_'
     '''
-    return line
+    out = ""
+    i = 0
 
+    while i < len(line):
+        if line[i] == "_":
+            j = line.find("_", i + 1)
+            if j == -1:
+                out += line[i:]
+                break
+
+            out += "<i>" + line[i + 1:j] + "</i>"
+            i = j + 1
+        else:
+            out += line[i]
+            i += 1
+
+    return out
 
 def compile_strikethrough(line):
     '''
@@ -94,7 +138,25 @@ def compile_strikethrough(line):
     >>> compile_strikethrough('~~')
     '~~'
     '''
-    return line
+    out = ""
+    i = 0
+
+    while i < len(line):
+        if line[i:i+2] == "~~":
+            j = line.find("~~", i + 2)
+            if j == -1:
+                out += line[i:]   
+                break
+
+            out += "<ins>" + line[i + 2:j] + "</ins>"
+            i = j + 2            
+        else:
+            out += line[i]
+            i += 1
+
+    return out
+
+
 
 
 def compile_bold_stars(line):
@@ -115,7 +177,23 @@ def compile_bold_stars(line):
     >>> compile_bold_stars('**')
     '**'
     '''
-    return line
+    out = ""
+    i = 0
+
+    while i < len(line):
+        if line[i:i+2] == "**":
+            j = line.find("**", i + 2)
+            if j == -1:
+                out += line[i:]   
+                break
+
+            out += "<b>" + line[i + 2:j] + "</b>"
+            i = j + 2            
+        else:
+            out += line[i]
+            i += 1
+
+    return out
 
 
 def compile_bold_underscore(line):
@@ -136,7 +214,23 @@ def compile_bold_underscore(line):
     >>> compile_bold_underscore('__')
     '__'
     '''
-    return line
+    out = ""
+    i = 0
+
+    while i < len(line):
+        if line[i:i+2] == "__":
+            j = line.find("__", i + 2)
+            if j == -1:
+                out += line[i:]   
+                break
+
+            out += "<b>" + line[i + 2:j] + "</b>"
+            i = j + 2            
+        else:
+            out += line[i]
+            i += 1
+
+    return out
 
 
 def compile_code_inline(line):
