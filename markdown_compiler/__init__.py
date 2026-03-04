@@ -292,7 +292,7 @@ def convert_file(input_file, add_css):
 
     # generate the HTML from the Markdown
     html = markdown_to_html(markdown, add_css)
-    html = minify(html)
+    # html = minify(html)
 
     # write the output file
     with open(input_file[:-2]+'html', 'w') as f:
