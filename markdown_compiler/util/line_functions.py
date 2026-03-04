@@ -64,23 +64,23 @@ def compile_italic_star(line):
     '*'
     '''
 
-    out = ""
+    accumulator = ""
     i = 0
 
     while i < len(line):
         if line[i] == "*":
             j = line.find("*", i + 1)
             if j == -1:
-                out += line[i:]
+                accumulator += line[i:]
                 break
 
-            out += "<i>" + line[i + 1:j] + "</i>"
+            accumulator += "<i>" + line[i + 1:j] + "</i>"
             i = j + 1
         else:
-            out += line[i]
+            accumulator += line[i]
             i += 1
 
-    return out
+    return accumulator
 
 def compile_italic_underscore(line):
     '''
@@ -100,23 +100,23 @@ def compile_italic_underscore(line):
     >>> compile_italic_underscore('_')
     '_'
     '''
-    out = ""
+    accumulator = ""
     i = 0
 
     while i < len(line):
         if line[i] == "_":
             j = line.find("_", i + 1)
             if j == -1:
-                out += line[i:]
+                accumulator += line[i:]
                 break
 
-            out += "<i>" + line[i + 1:j] + "</i>"
+            accumulator += "<i>" + line[i + 1:j] + "</i>"
             i = j + 1
         else:
-            out += line[i]
+            accumulator += line[i]
             i += 1
 
-    return out
+    return accumulator
 
 def compile_strikethrough(line):
     '''
@@ -138,23 +138,23 @@ def compile_strikethrough(line):
     >>> compile_strikethrough('~~')
     '~~'
     '''
-    out = ""
+    accumulator = ""
     i = 0
 
     while i < len(line):
         if line[i:i+2] == "~~":
             j = line.find("~~", i + 2)
             if j == -1:
-                out += line[i:]   
+                accumulator += line[i:]   
                 break
 
-            out += "<ins>" + line[i + 2:j] + "</ins>"
+            accumulator += "<ins>" + line[i + 2:j] + "</ins>"
             i = j + 2            
         else:
-            out += line[i]
+            accumulator += line[i]
             i += 1
 
-    return out
+    return accumulator
 
 
 
@@ -177,23 +177,23 @@ def compile_bold_stars(line):
     >>> compile_bold_stars('**')
     '**'
     '''
-    out = ""
+    accumulator = ""
     i = 0
 
     while i < len(line):
         if line[i:i+2] == "**":
             j = line.find("**", i + 2)
             if j == -1:
-                out += line[i:]   
+                accumulator += line[i:]   
                 break
 
-            out += "<b>" + line[i + 2:j] + "</b>"
+            accumulator += "<b>" + line[i + 2:j] + "</b>"
             i = j + 2            
         else:
-            out += line[i]
+            accumulator += line[i]
             i += 1
 
-    return out
+    return accumulator
 
 
 def compile_bold_underscore(line):
@@ -214,23 +214,28 @@ def compile_bold_underscore(line):
     >>> compile_bold_underscore('__')
     '__'
     '''
-    out = ""
+    accumulator = ""
     i = 0
 
     while i < len(line):
         if line[i:i+2] == "__":
             j = line.find("__", i + 2)
             if j == -1:
-                out += line[i:]   
+                accumulator += line[i:]
                 break
 
-            out += "<b>" + line[i + 2:j] + "</b>"
-            i = j + 2            
+            if j == i + 2:
+                accumulator += "__"
+                i += 2
+                continue
+
+            accumulator += "<b>" + line[i + 2:j] + "</b>"
+            i = j + 2
         else:
-            out += line[i]
+            accumulator += line[i]
             i += 1
 
-    return out
+    return accumulator
 
 
 def compile_code_inline(line):
@@ -260,8 +265,30 @@ def compile_code_inline(line):
     >>> compile_code_inline('```python3')
     '```python3'
     '''
-    return line
+    if line.startswith("```"):
+        return line
 
+    accumulator = ""
+    i = 0
+
+    while i < len(line):
+        if line[i] == "`":
+            j = line.find("`", i + 1)
+            if j == -1:
+                accumulator += line[i:]
+                break
+
+            code_text = line[i + 1:j]
+            code_text = code_text.replace("&", "&amp;")  
+            code_text = code_text.replace("<", "&lt;").replace(">", "&gt;")
+
+            accumulator += "<code>" + code_text + "</code>"
+            i = j + 1
+        else:
+            accumulator += line[i]
+            i += 1
+
+    return accumulator
 
 def compile_links(line):
     '''
@@ -273,15 +300,48 @@ def compile_links(line):
 
     >>> compile_links('Click on the [course webpage](https://github.com/mikeizbicki/cmc-csci040)!')
     'Click on the <a href="https://github.com/mikeizbicki/cmc-csci040">course webpage</a>!'
+
     >>> compile_links('[course webpage](https://github.com/mikeizbicki/cmc-csci040)')
     '<a href="https://github.com/mikeizbicki/cmc-csci040">course webpage</a>'
+
     >>> compile_links('this is wrong: [course webpage]    (https://github.com/mikeizbicki/cmc-csci040)')
     'this is wrong: [course webpage]    (https://github.com/mikeizbicki/cmc-csci040)'
+
     >>> compile_links('this is wrong: [course webpage](https://github.com/mikeizbicki/cmc-csci040')
     'this is wrong: [course webpage](https://github.com/mikeizbicki/cmc-csci040'
     '''
-    return line
 
+def compile_links(line):
+    accumulator = ""
+    i = 0
+
+    while i < len(line):
+        if line[i] == "[":
+            close_bracket = line.find("]", i + 1)
+            if close_bracket == -1:
+                accumulator += line[i:]
+                break
+
+            if close_bracket + 1 >= len(line) or line[close_bracket + 1] != "(":
+                accumulator += line[i]
+                i += 1
+                continue
+
+            close_paren = line.find(")", close_bracket + 2)
+            if close_paren == -1:
+                accumulator += line[i:]
+                break
+
+            title = line[i + 1:close_bracket]
+            url = line[close_bracket + 2:close_paren]
+
+            accumulator += f'<a href="{url}">{title}</a>'
+            i = close_paren + 1
+        else:
+            accumulator += line[i]
+            i += 1
+
+    return accumulator
 
 def compile_images(line):
     '''
@@ -299,4 +359,34 @@ def compile_images(line):
     >>> compile_images('This is an image of Mike Izbicki: ![Mike Izbicki](https://avatars1.githubusercontent.com/u/1052630?v=2&s=460)')
     'This is an image of Mike Izbicki: <img src="https://avatars1.githubusercontent.com/u/1052630?v=2&s=460" alt="Mike Izbicki" />'
     '''
-    return line
+
+    accumulator = ""
+    i = 0
+
+    while i < len(line):
+        if line[i : i + 1] == "![":
+            close_bracket = line.find("]", i + 1)
+            if close_bracket == -1:
+                accumulator += line[i:]
+                break
+
+            if close_bracket + 1 >= len(line) or line[close_bracket + 1] != "(":
+                accumulator += line[i]
+                i += 1
+                continue
+
+            close_paren = line.find(")", close_bracket + 2)
+            if close_paren == -1:
+                accumulator += line[i:]
+                break
+
+            title = line[i + 1:close_bracket]
+            url = line[close_bracket + 2:close_paren]
+
+            accumulator += f'<a href="{url}">{title}</a>'
+            i = close_paren + 1
+        else:
+            accumulator += line[i]
+            i += 1
+
+    return accumulator
