@@ -144,7 +144,7 @@ def compile_strikethrough(line):
     i = 0
 
     while i < len(line):
-        if line[i:i+2] == "~~":
+        if line[i: i + 2] == "~~":
             j = line.find("~~", i + 2)
             if j == -1:
                 accumulator += line[i:]
@@ -181,7 +181,7 @@ def compile_bold_stars(line):
     i = 0
 
     while i < len(line):
-        if line[i:i+2] == "**":
+        if line[i: i + 2] == "**":
             j = line.find("**", i + 2)
             if j == -1:
                 accumulator += line[i:]
@@ -218,7 +218,7 @@ def compile_bold_underscore(line):
     i = 0
 
     while i < len(line):
-        if line[i:i+2] == "__":
+        if line[i: i + 2] == "__":
             j = line.find("__", i + 2)
             if j == -1:
                 accumulator += line[i:]
@@ -366,7 +366,7 @@ def compile_images(line):
     i = 0
 
     while i < len(line):
-        if line[i:i+2] == "![":
+        if line[i: i + 2] == "![":
             close_bracket = line.find("]", i + 2)
             if close_bracket == -1:
                 accumulator += line[i:]
