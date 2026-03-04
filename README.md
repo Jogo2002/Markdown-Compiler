@@ -18,4 +18,4 @@ Fancy CSS formatting can be included with the flag `--add_css`:
 $ markdown-compiler example/README.md --add_css
 ```
 
-<img src='example/img/example.png' width=300px>
+<img src='example/img/example-css.png' width=300px>
