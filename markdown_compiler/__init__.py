@@ -133,16 +133,38 @@ def compile_lines(text):
     lines = text.split('\n')
     new_lines = []
     in_paragraph = False
+    in_pre = False
+
     for line in lines:
-        line = line.strip()
-        if line=='':
+        stripped = line.strip()
+
+        if in_pre:
+            # Inside a ``` block: NO markdown transforms, preserve indentation
+            if stripped == '```':
+                in_pre = False
+                new_lines.append('</pre>')
+            else:
+                new_lines.append(line)  # use original line, not stripped!
+            continue
+
+        if stripped == '```':
+            # Opening fence: start a <pre> block
+            in_pre = True
+            new_lines.append('<pre>')
+            continue
+
+        # Normal line processing
+        line = stripped
+        if line == '':
             if in_paragraph:
-                line='</p>'
+                new_lines.append('</p>')
                 in_paragraph = False
+            else:
+                new_lines.append('')
         else:
             if line[0] != '#' and not in_paragraph:
                 in_paragraph = True
-                line = '<p>\n'+line
+                new_lines.append('<p>')
             line = compile_headers(line)
             line = compile_strikethrough(line)
             line = compile_bold_stars(line)
@@ -152,9 +174,10 @@ def compile_lines(text):
             line = compile_code_inline(line)
             line = compile_images(line)
             line = compile_links(line)
-        new_lines.append(line)
-    new_text = '\n'.join(new_lines)
-    return new_text
+            new_lines.append(line)
+
+    return '\n'.join(new_lines)
+
 
 
 def markdown_to_html(markdown, add_css):
@@ -225,6 +248,31 @@ def minify(html):
     >>> minify('a\n\n\n\n\n\n\n\n\n\n\n\n\n\nb\n\n\n\n\n\n\n\n\n\n')
     'a b'
     '''
+
+    last_character_space = False
+    result = ""
+
+    html = html.strip()
+    for char in html: 
+        if char == " " or char == "\n":
+            last_character_space = True 
+
+        if char != "\n" and char != " ": 
+            if last_character_space: 
+                result += " " + char
+                last_character_space = False
+            else: 
+                result += char 
+                last_character_space = False
+
+    return result
+        
+
+    
+
+
+
+
     return html
 
 
