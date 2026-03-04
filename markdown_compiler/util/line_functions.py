@@ -354,18 +354,19 @@ def compile_images(line):
 
     >>> compile_images('[Mike Izbicki](https://avatars1.githubusercontent.com/u/1052630?v=2&s=460)')
     '[Mike Izbicki](https://avatars1.githubusercontent.com/u/1052630?v=2&s=460)'
+
     >>> compile_images('![Mike Izbicki](https://avatars1.githubusercontent.com/u/1052630?v=2&s=460)')
     '<img src="https://avatars1.githubusercontent.com/u/1052630?v=2&s=460" alt="Mike Izbicki" />'
+
     >>> compile_images('This is an image of Mike Izbicki: ![Mike Izbicki](https://avatars1.githubusercontent.com/u/1052630?v=2&s=460)')
     'This is an image of Mike Izbicki: <img src="https://avatars1.githubusercontent.com/u/1052630?v=2&s=460" alt="Mike Izbicki" />'
     '''
-
     accumulator = ""
     i = 0
 
     while i < len(line):
-        if line[i : i + 1] == "![":
-            close_bracket = line.find("]", i + 1)
+        if line[i:i+2] == "![":
+            close_bracket = line.find("]", i + 2)
             if close_bracket == -1:
                 accumulator += line[i:]
                 break
@@ -380,10 +381,10 @@ def compile_images(line):
                 accumulator += line[i:]
                 break
 
-            title = line[i + 1:close_bracket]
-            url = line[close_bracket + 2:close_paren]
+            alt_text = line[i + 2:close_bracket]
+            src = line[close_bracket + 2:close_paren]
 
-            accumulator += f'<a href="{url}">{title}</a>'
+            accumulator += f'<img src="{src}" alt="{alt_text}" />'
             i = close_paren + 1
         else:
             accumulator += line[i]
