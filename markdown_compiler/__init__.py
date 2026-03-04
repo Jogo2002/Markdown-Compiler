@@ -266,14 +266,7 @@ def minify(html):
                 last_character_space = False
 
     return result
-        
 
-    
-
-
-
-
-    return html
 
 
 def convert_file(input_file, add_css):
