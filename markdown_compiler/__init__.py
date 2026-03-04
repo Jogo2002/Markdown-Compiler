@@ -179,7 +179,6 @@ def compile_lines(text):
     return '\n'.join(new_lines)
 
 
-
 def markdown_to_html(markdown, add_css):
     '''
     Convert the input markdown into valid HTML,
@@ -211,7 +210,7 @@ def markdown_to_html(markdown, add_css):
 <link rel="stylesheet" href="https://izbicki.me/css/code.css" />
 <link rel="stylesheet" href="https://izbicki.me/css/default.css" />
         '''
-    html+='''
+    html += '''
 </head>
 <body>
     '''+compile_lines(markdown)+'''
@@ -253,20 +252,19 @@ def minify(html):
     result = ""
 
     html = html.strip()
-    for char in html: 
+    for char in html:
         if char == " " or char == "\n":
-            last_character_space = True 
+            last_character_space = True
 
-        if char != "\n" and char != " ": 
-            if last_character_space: 
+        if char != "\n" and char != " ":
+            if last_character_space:
                 result += " " + char
                 last_character_space = False
-            else: 
-                result += char 
+            else:
+                result += char
                 last_character_space = False
 
     return result
-
 
 
 def convert_file(input_file, add_css):

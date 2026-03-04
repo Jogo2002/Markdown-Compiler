@@ -2,6 +2,7 @@
 Each of the functions in this file takes a single line of input and transforms the line in some way.
 '''
 
+
 def compile_headers(line):
     '''
     Convert markdown headers into <h1>,<h2>,etc tags.
@@ -39,7 +40,6 @@ def compile_headers(line):
     elif line[:7] == '###### ':
         return '<h6>' + line[6:] + '</h6>'
     return line
-
 
 
 def compile_italic_star(line):
@@ -82,6 +82,7 @@ def compile_italic_star(line):
 
     return accumulator
 
+
 def compile_italic_underscore(line):
     '''
     Convert "_italic_" into "<i>italic</i>".
@@ -118,6 +119,7 @@ def compile_italic_underscore(line):
 
     return accumulator
 
+
 def compile_strikethrough(line):
     '''
     Convert "~~strikethrough~~" to "<ins>strikethrough</ins>".
@@ -145,18 +147,16 @@ def compile_strikethrough(line):
         if line[i:i+2] == "~~":
             j = line.find("~~", i + 2)
             if j == -1:
-                accumulator += line[i:]   
+                accumulator += line[i:]
                 break
 
             accumulator += "<ins>" + line[i + 2:j] + "</ins>"
-            i = j + 2            
+            i = j + 2
         else:
             accumulator += line[i]
             i += 1
 
     return accumulator
-
-
 
 
 def compile_bold_stars(line):
@@ -184,11 +184,11 @@ def compile_bold_stars(line):
         if line[i:i+2] == "**":
             j = line.find("**", i + 2)
             if j == -1:
-                accumulator += line[i:]   
+                accumulator += line[i:]
                 break
 
             accumulator += "<b>" + line[i + 2:j] + "</b>"
-            i = j + 2            
+            i = j + 2
         else:
             accumulator += line[i]
             i += 1
@@ -279,7 +279,7 @@ def compile_code_inline(line):
                 break
 
             code_text = line[i + 1:j]
-            code_text = code_text.replace("&", "&amp;")  
+            code_text = code_text.replace("&", "&amp;")
             code_text = code_text.replace("<", "&lt;").replace(">", "&gt;")
 
             accumulator += "<code>" + code_text + "</code>"
@@ -289,6 +289,7 @@ def compile_code_inline(line):
             i += 1
 
     return accumulator
+
 
 def compile_links(line):
     '''
@@ -311,7 +312,6 @@ def compile_links(line):
     'this is wrong: [course webpage](https://github.com/mikeizbicki/cmc-csci040'
     '''
 
-def compile_links(line):
     accumulator = ""
     i = 0
 
@@ -342,6 +342,7 @@ def compile_links(line):
             i += 1
 
     return accumulator
+
 
 def compile_images(line):
     '''
